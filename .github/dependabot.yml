@@ -1,0 +1,42 @@
+version: 2
+updates:
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    labels: # Optional
+      - "ci"
+      - "dependabot"
+    commit-message: # Optional
+      prefix: "chore(actions)"
+
+  # Maintain dependencies for npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    labels: # Optional
+      - "dependencies"
+      - "dependabot"
+    commit-message: # Optional
+      prefix: "chore(deps)"
+    ignore:
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "prettier"
+        update-types: ["version-update:semver-major"]
+    groups:
+      testing-libraries:
+        patterns:
+          - "*jest*"
+      eslint-tooling:
+        patterns:
+          - "eslint"
+          - "*eslint*"
+      typescript-related:
+        patterns:
+          - "typescript"
+          - "@types/*"
