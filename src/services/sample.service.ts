@@ -17,4 +17,8 @@ export class SampleService {
       time: new Date(),
     };
   }
+
+  public getSystemMemo(): string {
+    return "Welcome to the MCP Starter system! This is a dynamic resource.";
+  }
 }

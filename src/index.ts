@@ -8,6 +8,8 @@ import { allTools } from "./tools/index.js";
 import { initializeContainer } from "./container.js";
 import pkg from "../package.json" with { type: "json" };
 import { LogLevel } from "./services/logger.service.js";
+import { registerResources } from "./resources/index.js";
+import { registerPrompts } from "./prompts/index.js";
 
 async function main() {
   // 1. Initialize Services
@@ -23,6 +25,8 @@ async function main() {
     {
       capabilities: {
         logging: {},
+        resources: {},
+        prompts: {},
       },
     }
   );
@@ -62,6 +66,12 @@ async function main() {
       handler
     );
   });
+
+  // 6. Register Resources
+  registerResources(server, container);
+
+  // 7. Register Prompts
+  registerPrompts(server);
 
   // 6. Connect Transport (Stdio)
   const transport = new StdioServerTransport();
