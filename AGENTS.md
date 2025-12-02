@@ -46,6 +46,18 @@ This file provides instructions for AI coding agents on how to work with this pr
 3.  **Modify Handler Logic**: Update the `...Handler` function with the new logic.
 4.  **Update Tests**: Locate the relevant test file and add or update tests to cover your changes.
 
+### How to Add a New Resource
+
+1.  **Create the Resource File**: Add a new `.ts` file in `src/resources/` (e.g., `src/resources/sample/newResource.ts`).
+2.  **Define Resource Logic**: Export a function that handles the resource read request.
+3.  **Register the Resource**: In `src/resources/index.ts`, import your handler and register it using `server.resource(...)`.
+
+### How to Add a New Prompt
+
+1.  **Create the Prompt File**: Add a new `.ts` file in `src/prompts/` (e.g., `src/prompts/sample/newPrompt.ts`).
+2.  **Define Prompt Logic**: Export a function that handles the get prompt request.
+3.  **Register the Prompt**: In `src/prompts/index.ts`, import your handler and register it using `server.prompt(...)`.
+
 ## Testing Instructions
 
 - Run all tests with `npm run test`.
