@@ -60,17 +60,12 @@ jobs:
           echo "Bumped version to: $NEW_VERSION"
           echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV # Make version available to subsequent steps
 
-      - name: Update server.json version
-        run: |
-          # Also update the package version inside packages array
-          jq --arg v "${{ env.VERSION }}" '.version = $v | .packages[].version = $v' server.json > tmp && mv tmp server.json
-
       - name: Build project
         run: npm run build
 
       - name: Commit version bump
         run: |
-          git add package.json package-lock.json server.json
+          git add package.json package-lock.json
           git commit -m "chore(release): bump version to v${{ env.VERSION }}"
           # Pushing to the branch the workflow was run on (typically your main/default branch)
           # Assumes the PAT_GITHUB has permissions to push to this branch.
