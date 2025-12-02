@@ -66,14 +66,10 @@ export class LoggerService {
     data?: Record<string, unknown>,
     loggerName: string = "mcp-server"
   ) {
-    // 1. Always write to stderr for system administrators/terminal debugging
-    // We add a prefix so it doesn't look like JSON-RPC garbage
-    console.error(`[${level.toUpperCase()}] ${message}`);
-
-    // 2. Check strictness
+    // CHECK LEVEL FIRST
     if (!this.shouldLog(level)) return;
 
-    // 3. Send MCP Protocol Notification
+    // Send MCP Protocol Notification
     if (this.server) {
       try {
         await this.server.server.notification({
@@ -82,8 +78,8 @@ export class LoggerService {
             level,
             logger: loggerName,
             data: {
-              message, // The spec puts arbitrary data here, we include the message
-              ...data,
+              message,
+              ...this.sanitizeData(data), // Handle Error objects
             },
           },
         });
@@ -94,25 +90,70 @@ export class LoggerService {
     }
   }
 
+  // Helper to ensure Errors serialize correctly
+  private sanitizeData(
+    data?: Record<string, unknown>
+  ): Record<string, unknown> | undefined {
+    if (!data) return undefined;
+
+    // Create a shallow copy to modify
+    const cleanData: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(data)) {
+      if (value instanceof Error) {
+        // Explicitly extract Error properties
+        cleanData[key] = {
+          ...value, // spreads any custom properties on the error
+          name: value.name,
+          message: value.message,
+          stack: value.stack,
+        };
+      } else {
+        cleanData[key] = value;
+      }
+    }
+    return cleanData;
+  }
+
   // --- Convenience Methods ---
 
-  public debug(message: string, data?: Record<string, unknown>) {
-    void this.sendLog("debug", message, data);
+  public debug(
+    message: string,
+    data?: Record<string, unknown>,
+    logger?: string
+  ) {
+    void this.sendLog("debug", message, data, logger);
   }
 
-  public info(message: string, data?: Record<string, unknown>) {
-    void this.sendLog("info", message, data);
+  public info(
+    message: string,
+    data?: Record<string, unknown>,
+    logger?: string
+  ) {
+    void this.sendLog("info", message, data, logger);
   }
 
-  public warning(message: string, data?: Record<string, unknown>) {
-    void this.sendLog("warning", message, data);
+  public warning(
+    message: string,
+    data?: Record<string, unknown>,
+    logger?: string
+  ) {
+    void this.sendLog("warning", message, data, logger);
   }
 
-  public error(message: string, data?: Record<string, unknown>) {
-    void this.sendLog("error", message, data);
+  public error(
+    message: string,
+    data?: Record<string, unknown>,
+    logger?: string
+  ) {
+    void this.sendLog("error", message, data, logger);
   }
 
-  public critical(message: string, data?: Record<string, unknown>) {
-    void this.sendLog("critical", message, data);
+  public critical(
+    message: string,
+    data?: Record<string, unknown>,
+    logger?: string
+  ) {
+    void this.sendLog("critical", message, data, logger);
   }
 }
