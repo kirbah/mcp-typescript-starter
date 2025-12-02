@@ -52,3 +52,11 @@ This file provides instructions for AI coding agents on how to work with this pr
 - To run tests for a single file (which is faster during development), use: `npm run test -- <path_to_test_file>`.
 - Tests are written with Jest. Mocks for external services are heavily used.
 - Always add or update tests to reflect your code changes.
+
+## Quality Assurance
+
+Before submitting any changes, you **MUST** run the following commands to ensure code quality:
+
+1.  `npm run lint`: Fix any linting errors.
+2.  `npm run format:check`: Ensure code is formatted correctly.
+3.  `npm run test`: Ensure all tests pass.

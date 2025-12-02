@@ -22,7 +22,7 @@ export interface ToolDefinition {
 }
 
 export function allTools(container: IServiceContainer): ToolDefinition[] {
-  const { sampleService } = container;
+  const { sampleService, loggerService } = container;
 
   return [
     {
@@ -30,7 +30,8 @@ export function allTools(container: IServiceContainer): ToolDefinition[] {
       handler: (params) =>
         calculateSumHandler(
           params as z.infer<typeof calculateSumSchema>,
-          sampleService
+          sampleService,
+          loggerService
         ),
     },
     {
