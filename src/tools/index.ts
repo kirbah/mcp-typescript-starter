@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { IServiceContainer } from "../container.js";
 import {
   calculateSumConfig,
@@ -12,33 +12,25 @@ import {
   sayHelloSchema,
 } from "./sample/sayHello.js";
 
-export interface ToolDefinition {
-  config: {
-    name: string;
-    description: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    inputSchema: z.ZodObject<any>;
-  };
-  handler: (params: unknown) => Promise<CallToolResult>;
-}
-
-export function allTools(container: IServiceContainer): ToolDefinition[] {
+export function registerTools(server: McpServer, container: IServiceContainer) {
   const { sampleService, loggerService } = container;
 
-  return [
-    {
-      config: calculateSumConfig,
-      handler: (params) =>
-        calculateSumHandler(
-          params as z.infer<typeof calculateSumSchema>,
-          sampleService,
-          loggerService
-        ),
-    },
-    {
-      config: sayHelloConfig,
-      handler: (params) =>
-        sayHelloHandler(params as z.infer<typeof sayHelloSchema>),
-    },
-  ];
+  server.tool(
+    calculateSumConfig.name,
+    calculateSumConfig.description,
+    calculateSumConfig.inputSchema.shape,
+    (params) =>
+      calculateSumHandler(
+        params as z.infer<typeof calculateSumSchema>,
+        sampleService,
+        loggerService
+      )
+  );
+
+  server.tool(
+    sayHelloConfig.name,
+    sayHelloConfig.description,
+    sayHelloConfig.inputSchema.shape,
+    (params) => sayHelloHandler(params as z.infer<typeof sayHelloSchema>)
+  );
 }

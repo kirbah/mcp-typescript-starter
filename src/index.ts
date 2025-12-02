@@ -4,10 +4,10 @@ import "dotenv/config";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { allTools } from "./tools/index.js";
 import { initializeContainer } from "./container.js";
 import pkg from "../package.json" with { type: "json" };
 import { LogLevel } from "./services/logger.service.js";
+import { registerTools } from "./tools/index.js";
 import { registerResources } from "./resources/index.js";
 import { registerPrompts } from "./prompts/index.js";
 
@@ -58,14 +58,7 @@ async function main() {
   );
 
   // 5. Register Tools
-  allTools(container).forEach(({ config, handler }) => {
-    server.tool(
-      config.name,
-      config.description,
-      config.inputSchema.shape,
-      handler
-    );
-  });
+  registerTools(server, container);
 
   // 6. Register Resources
   registerResources(server, container);
