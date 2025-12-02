@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { SampleService } from "../../services/sample.service.js";
+import { LoggerService } from "../../services/logger.service.js";
 import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 
 // 1. Define Schema
@@ -18,9 +19,15 @@ export const calculateSumConfig = {
 // 3. Define Handler
 export const calculateSumHandler = async (
   params: z.infer<typeof calculateSumSchema>,
-  sampleService: SampleService
+  sampleService: SampleService,
+  logger: LoggerService
 ): Promise<CallToolResult> => {
   try {
+    logger.info("Calculating sum", {
+      operation: "add",
+      operands: [params.a, params.b],
+    });
+
     const result = await Promise.resolve(
       sampleService.addNumbers(params.a, params.b)
     );
@@ -34,6 +41,7 @@ export const calculateSumHandler = async (
       ],
     };
   } catch (error) {
+    logger.error("Calculation failed", { error: String(error) });
     return {
       content: [
         {

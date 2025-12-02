@@ -10,6 +10,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
+    "start:client": "tsx ./src/index.ts",
     "dev": "tsc --watch",
     "lint": "eslint .",
     "format": "prettier --write .",
@@ -20,6 +21,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.1",
     "dotenv": "^16.4.5",
+    "tsx": "^4.20.4",
     "zod": "^3.23.8"
   },
   "devDependencies": {
