@@ -16,7 +16,8 @@ export interface ToolDefinition {
   config: {
     name: string;
     description: string;
-    inputSchema: z.AnyZodObject;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    inputSchema: z.ZodObject<any>;
   };
   handler: (params: unknown) => Promise<CallToolResult>;
 }
