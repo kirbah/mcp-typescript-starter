@@ -23,10 +23,14 @@ export const calculateSumHandler = async (
   logger: LoggerService
 ): Promise<CallToolResult> => {
   try {
-    logger.info("Calculating sum", {
-      operation: "add",
-      operands: [params.a, params.b],
-    });
+    logger.info(
+      "Calculating sum",
+      {
+        operation: "add",
+        operands: [params.a, params.b],
+      },
+      "tool:calculateSum"
+    );
 
     const result = await Promise.resolve(
       sampleService.addNumbers(params.a, params.b)
@@ -41,7 +45,7 @@ export const calculateSumHandler = async (
       ],
     };
   } catch (error) {
-    logger.error("Calculation failed", { error: String(error) });
+    logger.error("Calculation failed", { error }, "tool:calculateSum");
     return {
       content: [
         {
