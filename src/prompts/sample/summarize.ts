@@ -1,30 +1,32 @@
 import { z } from "zod";
+import { GetPromptResult } from "@modelcontextprotocol/sdk/types.js";
+import { BasePrompt } from "../base.js";
 
-// 1. Definition
-export const summarizePrompt = {
-  name: "summarize_memo",
-  description: "Creates a prompt to summarize the system memo",
-  inputSchema: z.object({
-    style: z
-      .string()
-      .optional()
-      .describe("The style of summary (brief or detailed)"),
-  }),
-};
+const SummarizeSchema = z.object({
+  style: z
+    .string()
+    .optional()
+    .describe("The style of summary (brief or detailed)"),
+});
 
-// 2. Handler
-export const summarizePromptHandler = (args: { style?: string }) => {
-  const style = args.style || "brief";
+export class SummarizePrompt extends BasePrompt<typeof SummarizeSchema> {
+  name = "summarize_memo";
+  description = "Creates a prompt to summarize the system memo";
+  schema = SummarizeSchema;
 
-  return {
-    messages: [
-      {
-        role: "user" as const,
-        content: {
-          type: "text" as const,
-          text: `Please read the resource at 'memo://system/daily-briefing' and provide a ${style} summary of its contents.`,
+  async get(params: z.infer<typeof SummarizeSchema>): Promise<GetPromptResult> {
+    const style = params.style || "brief";
+
+    return {
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: `Please read the resource at 'memo://system/daily-briefing' and provide a ${style} summary of its contents.`,
+          },
         },
-      },
-    ],
-  };
-};
+      ],
+    };
+  }
+}

@@ -1,58 +1,24 @@
-import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { GetPromptResult } from "@modelcontextprotocol/sdk/types.js";
 import { IServiceContainer } from "../container.js";
-import { summarizePrompt, summarizePromptHandler } from "./sample/summarize.js";
+import { SummarizePrompt } from "./sample/summarize.js";
 
-// Define the interface for a prompt definition
-export interface PromptDefinition {
-  config: {
-    name: string;
-    description: string;
-    inputSchema: z.ZodObject<z.ZodRawShape>;
-  };
-  handler: (params: Record<string, unknown>) => GetPromptResult;
-}
-
-/**
- * Gather all prompts and inject dependencies.
- */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function allPrompts(container: IServiceContainer): PromptDefinition[] {
-  // No dependencies needed for now
-  // const { sampleService, loggerService } = container;
-
-  return [
-    {
-      config: summarizePrompt,
-      handler: (params) =>
-        summarizePromptHandler(
-          params as z.infer<typeof summarizePrompt.inputSchema>
-        ),
-    },
-  ];
-}
+const PROMPT_CLASSES = [SummarizePrompt];
 
 export function registerPrompts(
   server: McpServer,
   container: IServiceContainer
 ) {
-  function registerPrompt<T extends z.ZodObject<z.ZodRawShape>>(
-    config: { name: string; description: string; inputSchema: T },
-    handler: (args: z.infer<T>) => GetPromptResult
-  ) {
+  for (const PromptClass of PROMPT_CLASSES) {
+    const promptInstance = new PromptClass(container);
+    const definition = promptInstance.getDefinition();
+
     server.registerPrompt(
-      config.name,
+      definition.name,
       {
-        description: config.description,
-        argsSchema: config.inputSchema.shape,
+        description: definition.description,
+        argsSchema: (definition.arguments as any).shape,
       },
-      (args: unknown) => handler(args as z.infer<T>)
+      (args: any) => promptInstance.get(args)
     );
   }
-
-  // Iterate and register
-  allPrompts(container).forEach(({ config, handler }) =>
-    registerPrompt(config, handler)
-  );
 }
