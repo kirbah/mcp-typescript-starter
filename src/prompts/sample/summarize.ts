@@ -14,10 +14,10 @@ export class SummarizePrompt extends BasePrompt<typeof SummarizeSchema> {
   description = "Creates a prompt to summarize the system memo";
   schema = SummarizeSchema;
 
-  async get(params: z.infer<typeof SummarizeSchema>): Promise<GetPromptResult> {
+  get(params: z.infer<typeof SummarizeSchema>): Promise<GetPromptResult> {
     const style = params.style || "brief";
 
-    return {
+    return Promise.resolve({
       messages: [
         {
           role: "user",
@@ -27,6 +27,6 @@ export class SummarizePrompt extends BasePrompt<typeof SummarizeSchema> {
           },
         },
       ],
-    };
+    });
   }
 }

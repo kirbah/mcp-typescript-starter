@@ -7,11 +7,11 @@ export class SystemMemoResource extends BaseResource {
   mimeType = "text/plain";
   description = "A dynamic memo from the system";
 
-  async read(uri: URL): Promise<ReadResourceResult> {
+  read(_uri: URL): Promise<ReadResourceResult> {
     const { sampleService } = this.container;
     const memo = sampleService.getSystemMemo();
 
-    return {
+    return Promise.resolve({
       contents: [
         {
           uri: this.uri,
@@ -19,6 +19,6 @@ export class SystemMemoResource extends BaseResource {
           text: memo,
         },
       ],
-    };
+    });
   }
 }
