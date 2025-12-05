@@ -17,8 +17,8 @@ export interface ResourceDefinition {
 export function allResources(
   container: IServiceContainer
 ): ResourceDefinition[] {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { sampleService } = container;
+  // No dependencies needed for now
+  // const { sampleService, loggerService } = container;
 
   return [
     {

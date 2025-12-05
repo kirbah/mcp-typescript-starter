@@ -17,9 +17,10 @@ export interface PromptDefinition {
 /**
  * Gather all prompts and inject dependencies.
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function allPrompts(container: IServiceContainer): PromptDefinition[] {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { sampleService, loggerService } = container;
+  // No dependencies needed for now
+  // const { sampleService, loggerService } = container;
 
   return [
     {
