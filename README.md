@@ -16,7 +16,7 @@ A production-ready TypeScript template for building Model Context Protocol (MCP)
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/yourusername/mcp-typescript-starter.git my-mcp-server
+git clone https://github.com/kirbah/mcp-typescript-starter.git my-mcp-server
 cd my-mcp-server
 npm install
 ```

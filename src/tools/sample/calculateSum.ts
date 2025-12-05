@@ -1,59 +1,32 @@
 import { z } from "zod";
-import { SampleService } from "../../services/sample.service.js";
-import { LoggerService } from "../../services/logger.service.js";
-import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { BaseTool } from "../base.js";
 
-// 1. Define Schema
-export const calculateSumSchema = z.object({
+const schema = z.object({
   a: z.number().describe("The first number"),
   b: z.number().describe("The second number"),
 });
 
-// 2. Define Configuration
-export const calculateSumConfig = {
-  name: "calculate_sum",
-  description: "Adds two numbers together using the sample service.",
-  inputSchema: calculateSumSchema,
-};
+export class CalculateSumTool extends BaseTool<typeof schema> {
+  name = "calculate_sum";
+  description = "Adds two numbers together using the sample service.";
+  schema = schema;
 
-// 3. Define Handler
-export const calculateSumHandler = async (
-  params: z.infer<typeof calculateSumSchema>,
-  sampleService: SampleService,
-  logger: LoggerService
-): Promise<CallToolResult> => {
-  try {
-    logger.info(
-      "Calculating sum",
-      {
-        operation: "add",
-        operands: [params.a, params.b],
-      },
-      "tool:calculateSum"
-    );
+  // eslint-disable-next-line @typescript-eslint/require-await
+  protected async executeImpl(params: z.infer<typeof schema>) {
+    // Access services directly via this.container
+    const { sampleService, loggerService } = this.container;
 
-    const result = await Promise.resolve(
-      sampleService.addNumbers(params.a, params.b)
-    );
+    loggerService.info("Calculating sum", { a: params.a, b: params.b });
+
+    const result = sampleService.addNumbers(params.a, params.b);
 
     return {
       content: [
         {
-          type: "text",
+          type: "text" as const,
           text: `The sum is ${result}`,
         },
       ],
     };
-  } catch (error) {
-    logger.error("Calculation failed", { error }, "tool:calculateSum");
-    return {
-      content: [
-        {
-          type: "text",
-          text: `Error: ${error instanceof Error ? error.message : String(error)}`,
-        },
-      ],
-      isError: true,
-    };
   }
-};
+}
