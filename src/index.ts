@@ -64,7 +64,7 @@ async function main() {
   registerResources(server, container);
 
   // 7. Register Prompts
-  registerPrompts(server);
+  registerPrompts(server, container);
 
   // 8. Connect Transport (Stdio)
   const transport = new StdioServerTransport();
