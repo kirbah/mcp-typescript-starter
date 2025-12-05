@@ -14,7 +14,9 @@ export class SummarizePrompt extends BasePrompt<typeof SummarizeSchema> {
   description = "Creates a prompt to summarize the system memo";
   schema = SummarizeSchema;
 
-  get(params: z.infer<typeof SummarizeSchema>): Promise<GetPromptResult> {
+  protected getImpl(
+    params: z.infer<typeof SummarizeSchema>
+  ): Promise<GetPromptResult> {
     const style = params.style || "brief";
 
     return Promise.resolve({

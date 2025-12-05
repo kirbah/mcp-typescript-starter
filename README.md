@@ -1,19 +1,17 @@
 # MCP TypeScript Starter
 
-A production-ready TypeScript template for building Model Context Protocol (MCP) servers. Features dependency injection, Zod validation, and a scalable folder structure.
+A production-ready TypeScript template for building Model Context Protocol (MCP) servers.
 
 ## Features
 
-- **Minimalist Core**: Pure `stdio` transport, no unnecessary HTTP overhead.
-- **Dependency Injection**: Clean architecture using a simple container pattern.
-- **Type Safety**: Full TypeScript support with Zod for runtime validation.
+- **Class-Based Architecture**: scalable patterns for Tools, Resources, and Prompts.
+- **Dependency Injection**: Clean access to services (Logger, Config, etc.) via a unified container.
+- **Type Safety**: Automatic Zod validation for inputs.
 - **Quality Tools**: Pre-configured with ESLint, Prettier, and Jest.
 
 ## Quick Start
 
 ### 1. Installation
-
-Clone the repository and install dependencies:
 
 ```bash
 git clone https://github.com/kirbah/mcp-typescript-starter.git my-mcp-server
@@ -23,35 +21,24 @@ npm install
 
 ### 2. Build and Run
 
-Build the project:
-
 ```bash
 npm run build
-```
-
-Run the server (stdio mode):
-
-```bash
 npm start
 ```
 
 ### 3. Development
 
-Run in watch mode:
-
 ```bash
+# Watch mode for auto-reloading
 npm run dev
-```
 
-Test with the MCP Inspector:
-
-```bash
+# Debug using the MCP Inspector
 npm run inspector
 ```
 
-## How to Use with an MCP Client
+## Configuration (Claude Desktop)
 
-To use this server with an MCP client (like Claude Desktop), add the following configuration to your client's config file:
+To use this server with Claude Desktop, add this to your `claude_desktop_config.json`:
 
 ```json
 {
@@ -64,20 +51,66 @@ To use this server with an MCP client (like Claude Desktop), add the following c
 }
 ```
 
-## Project Structure
+## Architecture
 
-- `src/index.ts`: Entry point.
-- `src/container.ts`: Dependency injection container.
-- `src/services/`: Business logic services.
-- `src/tools/`: MCP tool definitions.
-  - `sample/calculateSum.ts`: Example tool.
-  - `sample/sayHello.ts`: Example tool.
-- `src/tools/index.ts`: Tool registry.
+This project uses a **Class-based pattern** to ensure consistency and type safety.
 
-## Adding a New Tool
+- **`src/container.ts`**: Singletons (Logger, Services) are instantiated here.
+- **`src/tools/base.ts`**: The base class that handles error catching and input validation.
+- **`src/tools/index.ts`**: The registry file where tools are loaded.
 
-1.  Create a new file in `src/tools/`.
-2.  Define the Zod schema, configuration, and handler.
-3.  Register the tool in `src/tools/index.ts`.
+## How to Add a New Tool
 
-See `src/tools/sample/sayHello.ts` for a simple example.
+1.  **Create a file** in `src/tools/` (e.g., `myTool.ts`).
+2.  **Extend `BaseTool`** and define your Zod schema:
+
+```typescript
+import { z } from "zod";
+import { BaseTool } from "../base.js";
+
+const InputSchema = z.object({
+  name: z.string(),
+});
+
+export class MyTool extends BaseTool<typeof InputSchema> {
+  name = "my_tool";
+  description = "Example description";
+  schema = InputSchema;
+
+  protected async executeImpl(params: z.infer<typeof InputSchema>) {
+    // Access services via this.container
+    this.container.loggerService.info("Tool ran!");
+
+    return {
+      content: [{ type: "text", text: `Hello ${params.name}` }],
+    };
+  }
+}
+```
+
+3.  **Register it** in `src/tools/index.ts`:
+
+```typescript
+// ... imports
+const TOOL_CLASSES = [
+  CalculateSumTool,
+  SayHelloTool,
+  MyTool, // <-- Add here
+];
+```
+
+_The same pattern applies to **Resources** (`extends BaseResource`) and **Prompts** (`extends BasePrompt`)._
+
+## Key Commands
+
+| Command          | Description                     |
+| ---------------- | ------------------------------- |
+| `npm run build`  | Compiles TypeScript to `/dist`. |
+| `npm run dev`    | Runs in watch mode.             |
+| `npm run test`   | Runs Jest tests.                |
+| `npm run format` | Formats code with Prettier.     |
+| `npm run lint`   | Checks for code issues.         |
+
+```
+
+```
