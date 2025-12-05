@@ -10,8 +10,23 @@ export abstract class BaseResource {
   abstract description?: string;
 
   /**
-   * Execute the resource reading logic.
-   * @param uri The actual URI requested (useful if using templates)
+   * Internal implementation of the resource reading logic.
    */
-  abstract read(uri: URL): Promise<ReadResourceResult>;
+  protected abstract readImpl(uri: URL): Promise<ReadResourceResult>;
+
+  /**
+   * Public entry point that handles error catching and logging.
+   */
+  public async read(uri: URL): Promise<ReadResourceResult> {
+    try {
+      return await this.readImpl(uri);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      this.container.loggerService.error(`Resource read failed: ${this.name}`, {
+        error: errorMessage,
+        uri: uri.toString(),
+      });
+      throw err; // Re-throw so the MCP client receives the error
+    }
+  }
 }

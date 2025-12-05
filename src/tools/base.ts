@@ -3,8 +3,8 @@ import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { IServiceContainer } from "../container.js";
 
 export abstract class BaseTool<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  T extends z.ZodType<any, any, any> = z.ZodType<any, any, any>,
+  // Enforce ZodObject to ensure .shape property exists
+  T extends z.ZodObject<z.ZodRawShape> = z.ZodObject<z.ZodRawShape>,
 > {
   // Dependencies are injected automatically via constructor
   constructor(protected container: IServiceContainer) {}

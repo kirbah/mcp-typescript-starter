@@ -11,7 +11,21 @@ export abstract class BasePrompt<
   abstract description: string;
   abstract schema: T;
 
-  abstract get(params: z.infer<T>): Promise<GetPromptResult>;
+  protected abstract getImpl(params: z.infer<T>): Promise<GetPromptResult>;
+
+  public async get(params: unknown): Promise<GetPromptResult> {
+    try {
+      const validatedParams = await this.schema.parseAsync(params);
+      return await this.getImpl(validatedParams);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      this.container.loggerService.error(
+        `Prompt generation failed: ${this.name}`,
+        { error: errorMessage }
+      );
+      throw err;
+    }
+  }
 
   public getDefinition() {
     return {

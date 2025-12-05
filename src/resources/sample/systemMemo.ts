@@ -7,7 +7,7 @@ export class SystemMemoResource extends BaseResource {
   mimeType = "text/plain";
   description = "A dynamic memo from the system";
 
-  read(_uri: URL): Promise<ReadResourceResult> {
+  protected readImpl(_uri: URL): Promise<ReadResourceResult> {
     const { sampleService } = this.container;
     const memo = sampleService.getSystemMemo();
 
