@@ -47,15 +47,17 @@ This file provides instructions for AI coding agents on how to work with this pr
 
 ### How to Add a New Resource
 
-1.  **Create the Resource File**: Add a new `.ts` file in `src/resources/` (e.g., `src/resources/sample/newResource.ts`).
-2.  **Define Resource Logic**: Export a function that handles the resource read request.
-3.  **Register the Resource**: In `src/resources/index.ts`, import your handler and register it using `server.resource(...)`.
+1.  **Create the Resource File**: Add a new `.ts` file in the appropriate subdirectory of `src/resources/` (e.g., `src/resources/sample/newResource.ts`).
+2.  **Create the Class**: Export a class extending `BaseResource`. Implement the `uri`, `name`, `mimeType`, `description` properties and the `read` method.
+3.  **Implement Logic**: Access services via `this.container`.
+4.  **Register the Resource**: Import your class in `src/resources/index.ts` and add it to the `RESOURCE_CLASSES` array.
 
 ### How to Add a New Prompt
 
-1.  **Create the Prompt File**: Add a new `.ts` file in `src/prompts/` (e.g., `src/prompts/sample/newPrompt.ts`).
-2.  **Define Prompt Logic**: Export a function that handles the get prompt request.
-3.  **Register the Prompt**: In `src/prompts/index.ts`, import your handler and register it using `server.prompt(...)`.
+1.  **Create the Prompt File**: Add a new `.ts` file in the appropriate subdirectory of `src/prompts/` (e.g., `src/prompts/sample/newPrompt.ts`).
+2.  **Create the Class**: Export a class extending `BasePrompt<typeof schema>`. Implement the `name`, `description`, `schema` properties and the `get` method.
+3.  **Implement Logic**: Access services via `this.container`.
+4.  **Register the Prompt**: Import your class in `src/prompts/index.ts` and add it to the `PROMPT_CLASSES` array.
 
 ## Testing Instructions
 

@@ -1,25 +1,24 @@
-import { IServiceContainer } from "../../container.js";
+import { ReadResourceResult } from "@modelcontextprotocol/sdk/types.js";
+import { BaseResource } from "../base.js";
 
-// 1. Definition
-export const systemMemoResource = {
-  uri: "memo://system/daily-briefing", // Custom URI scheme
-  name: "System Daily Briefing",
-  description: "A dynamic memo from the system",
-  mimeType: "text/plain",
-};
+export class SystemMemoResource extends BaseResource {
+  uri = "memo://system/daily-briefing";
+  name = "System Daily Briefing";
+  mimeType = "text/plain";
+  description = "A dynamic memo from the system";
 
-// 2. Handler
-export const systemMemoHandler = (container: IServiceContainer) => {
-  const { sampleService } = container;
-  const memo = sampleService.getSystemMemo();
+  read(_uri: URL): Promise<ReadResourceResult> {
+    const { sampleService } = this.container;
+    const memo = sampleService.getSystemMemo();
 
-  return {
-    contents: [
-      {
-        uri: systemMemoResource.uri,
-        mimeType: systemMemoResource.mimeType,
-        text: memo,
-      },
-    ],
-  };
-};
+    return Promise.resolve({
+      contents: [
+        {
+          uri: this.uri,
+          mimeType: this.mimeType,
+          text: memo,
+        },
+      ],
+    });
+  }
+}

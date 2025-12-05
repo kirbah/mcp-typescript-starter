@@ -1,58 +1,29 @@
 import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { GetPromptResult } from "@modelcontextprotocol/sdk/types.js";
 import { IServiceContainer } from "../container.js";
-import { summarizePrompt, summarizePromptHandler } from "./sample/summarize.js";
+import { BasePrompt } from "./base.js";
+import { SummarizePrompt } from "./sample/summarize.js";
 
-// Define the interface for a prompt definition
-export interface PromptDefinition {
-  config: {
-    name: string;
-    description: string;
-    inputSchema: z.ZodObject<z.ZodRawShape>;
-  };
-  handler: (params: Record<string, unknown>) => GetPromptResult;
-}
+const PROMPT_CLASSES = [SummarizePrompt];
 
-/**
- * Gather all prompts and inject dependencies.
- */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function allPrompts(container: IServiceContainer): PromptDefinition[] {
-  // No dependencies needed for now
-  // const { sampleService, loggerService } = container;
-
-  return [
-    {
-      config: summarizePrompt,
-      handler: (params) =>
-        summarizePromptHandler(
-          params as z.infer<typeof summarizePrompt.inputSchema>
-        ),
-    },
-  ];
+// Helper to preserve generic type safety when registering prompts
+function registerPromptSafe<T extends z.ZodObject<z.ZodRawShape>>(
+  server: McpServer,
+  promptInstance: BasePrompt<T>
+) {
+  server.registerPrompt(
+    promptInstance.name,
+    promptInstance.getDefinition(),
+    (args) => promptInstance.get(args as z.infer<T>)
+  );
 }
 
 export function registerPrompts(
   server: McpServer,
   container: IServiceContainer
 ) {
-  function registerPrompt<T extends z.ZodObject<z.ZodRawShape>>(
-    config: { name: string; description: string; inputSchema: T },
-    handler: (args: z.infer<T>) => GetPromptResult
-  ) {
-    server.registerPrompt(
-      config.name,
-      {
-        description: config.description,
-        argsSchema: config.inputSchema.shape,
-      },
-      (args: unknown) => handler(args as z.infer<T>)
-    );
+  for (const PromptClass of PROMPT_CLASSES) {
+    const promptInstance = new PromptClass(container);
+    registerPromptSafe(server, promptInstance);
   }
-
-  // Iterate and register
-  allPrompts(container).forEach(({ config, handler }) =>
-    registerPrompt(config, handler)
-  );
 }

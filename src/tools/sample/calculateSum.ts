@@ -11,8 +11,7 @@ export class CalculateSumTool extends BaseTool<typeof schema> {
   description = "Adds two numbers together using the sample service.";
   schema = schema;
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  protected async executeImpl(params: z.infer<typeof schema>) {
+  protected executeImpl(params: z.infer<typeof schema>) {
     // Access services directly via this.container
     const { sampleService, loggerService } = this.container;
 
@@ -20,13 +19,13 @@ export class CalculateSumTool extends BaseTool<typeof schema> {
 
     const result = sampleService.addNumbers(params.a, params.b);
 
-    return {
+    return Promise.resolve({
       content: [
         {
           type: "text" as const,
           text: `The sum is ${result}`,
         },
       ],
-    };
+    });
   }
 }
