@@ -22,28 +22,27 @@ This file provides instructions for AI coding agents on how to work with this pr
 ## Project Architecture
 
 - **Entry Point**: `src/index.ts` initializes the environment, the service container, and the MCP server. It registers all tools.
-- **Dependency Injection**: `src/container.ts` manages singleton instances of core services. When you need access to a service within a tool handler, it is injected via `src/tools/index.ts`.
+- **Dependency Injection**: `src/container.ts` manages singleton instances of core services. When you need access to a service within a tool handler, it is injected via the `BaseTool` class.
 - **Services (`src/services/`)**:
   - `SampleService`: Example service demonstrating business logic.
   - **New Services**: Create new services here for your specific logic.
-- **Tools (`src/tools/`)**: Each tool is defined in its own file and has three parts: a Zod schema for input validation, a configuration object (`...Config`), and a handler function (`...Handler`).
-- **Tool Registration**: `src/tools/index.ts` is the central registry. All new tools must be added to the `allTools` array here to be exposed by the server.
+- **Tools (`src/tools/`)**: Each tool is a class extending `BaseTool`. It encapsulates the schema, business logic, and dependency access.
+- **Tool Registration**: `src/tools/index.ts` is the central registry. All new tool classes must be added to the `TOOL_CLASSES` array here.
 
 ## Common Tasks
 
 ### How to Add a New Tool
 
 1.  **Create the Tool File**: Add a new `.ts` file in the appropriate subdirectory of `src/tools/` (e.g., `src/tools/sample/newTool.ts`).
-2.  **Define Input Schema**: In the new file, define a `zod` schema for the tool's input parameters.
-3.  **Define Tool Configuration**: Export a `...Config` object containing the tool's `name`, `description`, and `inputSchema`.
-4.  **Implement the Handler**: Export an async `...Handler` function that accepts `params` and any required services. Implement the tool's logic and return the result.
-5.  **Register the Tool**: In `src/tools/index.ts`, import the new `config` and `handler`, and add them to the `toolDefinitions` array, injecting the necessary services.
+2.  **Create the Class**: Export a class extending `BaseTool<typeof schema>`. Implement the `name`, `description`, `schema` properties and the `executeImpl` method.
+3.  **Implement Logic**: Access services via `this.container` (e.g., `this.container.loggerService`).
+4.  **Register the Tool**: Import your class in `src/tools/index.ts` and add it to the `TOOL_CLASSES` array.
 
 ### How to Modify an Existing Tool
 
 1.  **Locate the Tool File**: Find the tool's definition in the `src/tools/` directory.
 2.  **Update Schema (if needed)**: If changing the tool's inputs, update the Zod schema in the tool's file.
-3.  **Modify Handler Logic**: Update the `...Handler` function with the new logic.
+3.  **Modify Handler Logic**: Update the `executeImpl` method with the new logic.
 4.  **Update Tests**: Locate the relevant test file and add or update tests to cover your changes.
 
 ### How to Add a New Resource

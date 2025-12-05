@@ -1,28 +1,23 @@
 import { z } from "zod";
-import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { BaseTool } from "../base.js";
 
-// 1. Define Schema
-export const sayHelloSchema = z.object({
-  name: z.string().describe("The name to greet"),
+const schema = z.object({
+  name: z.string().describe("The name of the person to greet"),
 });
 
-// 2. Define Configuration
-export const sayHelloConfig = {
-  name: "say_hello",
-  description: "Returns a greeting message.",
-  inputSchema: sayHelloSchema,
-};
+export class SayHelloTool extends BaseTool<typeof schema> {
+  name = "say_hello";
+  description = "Greets a user by name.";
+  schema = schema;
 
-// 3. Define Handler
-export const sayHelloHandler = async (
-  params: z.infer<typeof sayHelloSchema>
-): Promise<CallToolResult> => {
-  return await Promise.resolve({
-    content: [
-      {
-        type: "text",
-        text: `Hello, ${params.name}!`,
-      },
-    ],
-  });
-};
+  protected async executeImpl(params: z.infer<typeof schema>) {
+    return Promise.resolve({
+      content: [
+        {
+          type: "text" as const,
+          text: `Hello, ${params.name}!`,
+        },
+      ],
+    });
+  }
+}
