@@ -15,7 +15,11 @@ export class CalculateSumTool extends BaseTool<typeof schema> {
     // Access services directly via this.container
     const { sampleService, loggerService } = this.container;
 
+    // Log to loggerService. Example when loggerService is in use.
     loggerService.info("Calculating sum", { a: params.a, b: params.b });
+
+    // Log to stdio. Example when loggerService is not in use.
+    console.error("Calculating sum", { a: params.a, b: params.b });
 
     const result = sampleService.addNumbers(params.a, params.b);
 
