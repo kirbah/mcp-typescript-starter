@@ -30,6 +30,7 @@ export default {
     "!src/tools/index.ts", // Exclude barrel files if they only re-export
     "!src/types/**/*.ts", // Exclude type definitions
     "!src/**/__tests__/**", // Exclude test files themselves
+    "!src/radar/**",
     // Add any other files/patterns to exclude from coverage
   ],
   // Optional: Set coverage thresholds
